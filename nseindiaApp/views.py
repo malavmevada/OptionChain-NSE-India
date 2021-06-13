@@ -8,7 +8,7 @@ def get_data(request):
     youroption = 'NIFTY'
     yourPrice = ''
     yourDate = ''
-    # print("GET: ", request.GET.get('options'))
+    final = []
     if request.GET.get('options') == 'NIFTY':
         youroption = 'NIFTY'
     elif request.GET.get('options') == 'FINNIFTY':
@@ -19,13 +19,10 @@ def get_data(request):
     try:
         oldoption = youroption
         url = 'https://www.nseindia.com/api/option-chain-indices?symbol=' + youroption
-        # print("url : ", url)
         headers = {'User-Agent': 'Mozilla/5.0'}
         data = requests.get(url, headers=headers).content
         data2 = data.decode('utf-8')
         df = json.loads(data2)
-        print("df",df)
-        # print(df['records']['data'][0])
         final_data = df['records']['data']
         all_nse_ce = {}
         all_nse_pe = {}
@@ -34,10 +31,8 @@ def get_data(request):
         remove_pe = NSEPuts.objects.all()
         remove_pe.delete()
         for i in final_data:
-            # print(i)
             if 'PE' in i:
                 pe = i['PE']
-                # print(pe)
                 nse_pe = NSEPuts(
                     strikePrice=round(i['strikePrice'], 2),
                     expiryDate = i['expiryDate'],
@@ -106,38 +101,31 @@ def get_data(request):
 
         if request.GET.get('price') != 'select':
             yourPrice = request.GET.get('price')
-        if len(yourPrice)==0:
-            all_nse_ce = NSECalls.objects.all()
-            all_nse_pe = NSEPuts.objects.all()
-        else:
-            all_nse_ce = NSECalls.objects.filter(strikePrice=yourPrice)
-            all_nse_pe = NSEPuts.objects.filter(strikePrice=yourPrice)
+            if len(yourPrice)==0:
+                all_nse_ce = NSECalls.objects.all()
+                all_nse_pe = NSEPuts.objects.all()
+            else:
+                all_nse_ce = NSECalls.objects.filter(strikePrice=yourPrice)
+                all_nse_pe = NSEPuts.objects.filter(strikePrice=yourPrice)
 
-        if request.GET.get('ex-date') != 'select':
+        elif request.GET.get('ex-date') != 'select':
             yourDate = request.GET.get('ex-date')
-        if len(yourDate) == 0:
+            if len(yourDate) == 0:
+                all_nse_ce = NSECalls.objects.all()
+                all_nse_pe = NSEPuts.objects.all()
+            else:
+                all_nse_ce = NSECalls.objects.filter(expiryDate=yourDate)
+                all_nse_pe = NSEPuts.objects.filter(expiryDate=yourDate)
+        else:
             all_nse_ce = NSECalls.objects.all()
             all_nse_pe = NSEPuts.objects.all()
-        else:
-            all_nse_ce = NSECalls.objects.filter(expiryDate=yourDate)
-            all_nse_pe = NSEPuts.objects.filter(expiryDate=yourDate)
-
         final = list(zip(all_nse_ce, all_nse_pe))
 
     except Exception as e:
-        print(e)
         check = True
-    else:
-        return render(request, 'core/home.html', {
-            "final": final,
-            "yourOption": youroption,
-            "check": check,
-            "oldOption": oldoption,
-            "yourPrice":yourPrice,
-            "yourDate":yourDate
-        })
 
     return render(request,'core/home.html',{
+    "final": final,
     "check":check,
     "oldOption":oldoption,
     "yourOption": youroption,

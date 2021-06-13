@@ -1,6 +1,6 @@
 from django.db import models
 
-# Create your models here.
+# This model is for Calls only
 class NSECalls(models.Model):
     openInterest = models.IntegerField(blank=True, null=True)
     changeinOpenInterest = models.IntegerField(blank=True, null=True)
@@ -15,6 +15,7 @@ class NSECalls(models.Model):
     strikePrice = models.FloatField(max_length=20, blank=True, null=True)
     expiryDate = models.CharField(max_length=20,blank=True,null=True)
 
+# This model is for Puts only
 class NSEPuts(models.Model):
     strikePrice = models.FloatField(max_length=20, blank=True, null=True)
     bidQty = models.IntegerField(blank=True, null=True)
@@ -28,4 +29,3 @@ class NSEPuts(models.Model):
     changeinOpenInterest = models.IntegerField(blank=True, null=True)
     openInterest = models.IntegerField(blank=True, null=True)
     expiryDate = models.CharField(max_length=20,blank=True,null=True)
-    
