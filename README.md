@@ -16,7 +16,7 @@ After executing above command run this two command for database migrations,
 
 
 ```
-docker-compose run web python3 manage.py  makemigrations
+docker-compose run web python3 manage.py makemigrations
 
 docker-compose run web python3 manage.py migrate
 ```
