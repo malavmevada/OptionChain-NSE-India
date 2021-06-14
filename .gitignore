@@ -1,3 +1,4 @@
 .idea/*
 venv/*
 nseindiaApp/__pycache__/*
+.env
